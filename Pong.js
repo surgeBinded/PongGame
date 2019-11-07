@@ -1,32 +1,36 @@
-const coushonDisplacement = .3;
 const fieldBoundariesForCoushons = 8;
-const cushonMovement = function (event) {
+const initialSpeedRed = new THREE.Vector3(0, 0, 0);
+const initialSpeedBlue = new THREE.Vector3(0, 0, 0);
+const newSpeed = 0.1;
+
+function noKeyPressed(event) {
+    initialSpeedRed.y = 0;
+    initialSpeedBlue.y = 0;
+}
+
+function cushonMovement(event) {
     event.preventDefault();
 
-    if (event.keyCode === 83) // if "S" pressed
-        blueCoushon.position.y -= coushonDisplacement;
-    if (event.keyCode === 65) // if "A" pressed
-        blueCoushon.position.y += coushonDisplacement;
+    if (event.keyCode === 83) { // if "S" pressed
+        initialSpeedBlue.y = 0;
+        initialSpeedBlue.y -= newSpeed;
+    }
+    if (event.keyCode === 65) { // if "A" pressed
+        initialSpeedBlue.y = 0;
+        initialSpeedBlue.y += newSpeed;
+    } 
+    if (event.keyCode === 37) { // if 'arrow left' pressed
+        initialSpeedRed.y = 0;
+        initialSpeedRed.y -= newSpeed;
+    }
+    if (event.keyCode === 39) {// if 'arrow right' pressed
+        initialSpeedRed.y = 0;
+        initialSpeedRed.y += newSpeed;
+    }
 
-    // to keep the left coushon inside the field
-    if (blueCoushon.position.y > fieldBoundariesForCoushons)
-        blueCoushon.position.y = fieldBoundariesForCoushons;
-    else if (blueCoushon.position.y < -fieldBoundariesForCoushons)
-        blueCoushon.position.y = -fieldBoundariesForCoushons;
-
-    if (event.keyCode === 37) // if 'arrow left' pressed
-        redCoushon.position.y -= coushonDisplacement;
-    if (event.keyCode === 39) // if 'arrow right' pressed
-        redCoushon.position.y += coushonDisplacement;
-
-    // to keep the right coushon inside the field
-    if (redCoushon.position.y > fieldBoundariesForCoushons)
-        redCoushon.position.y = fieldBoundariesForCoushons;
-    else if (redCoushon.position.y < -fieldBoundariesForCoushons)
-        redCoushon.position.y = -fieldBoundariesForCoushons;
 }
-document.addEventListener('keydown', cushonMovement, false);
-document.addEventListener('keyup', function () { coushonDisplacement = 0 }, false);
+document.addEventListener('keydown', cushonMovement);
+document.addEventListener("keyup", noKeyPressed);
 
 let speed = 0.2;
 const plusOrMinusX = Math.random() < 0.5 ? -1 : 1;
@@ -68,7 +72,7 @@ function updateBoxHelpers() {
     redCoushonBBox.setFromObject(redCoushonBoxHelper);
 }
 
-const pushBallFromTextures = 0.4; // used to avoid sticking to the textures
+const pushBallFromTextures = 0.25; // used to avoid sticking to the textures
 function reflectBall() {
 
     if (ballBBox.intersectsBox(lowerBorderBBox)) {
@@ -119,6 +123,21 @@ function gameOverCheck() {
 
 }
 
+function keepCoushonsInTheField() {
+    if (redCoushon.position.y > fieldBoundariesForCoushons) {
+        redCoushon.position.y = fieldBoundariesForCoushons;
+    }
+    else if (redCoushon.position.y < -fieldBoundariesForCoushons) {
+        redCoushon.position.y = -fieldBoundariesForCoushons;
+    }
+    if (blueCoushon.position.y > fieldBoundariesForCoushons) {
+        blueCoushon.position.y = fieldBoundariesForCoushons;
+    }
+    else if (blueCoushon.position.y < -fieldBoundariesForCoushons) {
+        blueCoushon.position.y = -fieldBoundariesForCoushons;
+    }
+}
+
 const clock = new THREE.Clock();
 const controls1 = new THREE.TrackballControls(camera1, canvas1);
 const controls = new THREE.TrackballControls(camera, canvas);
@@ -126,6 +145,13 @@ function render() {
     requestAnimationFrame(render);
 
     const h = clock.getDelta();
+
+    keepCoushonsInTheField();
+
+    redCoushon.position.y += initialSpeedRed.y;
+    if (!multiPlayer) {
+        blueCoushon.position.y += initialSpeedBlue.y;
+    }
 
     updateBoxHelpers()
 
@@ -148,3 +174,5 @@ function render() {
 }
 
 render();
+
+

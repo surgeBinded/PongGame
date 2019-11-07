@@ -22,7 +22,7 @@ camera.lookAt(scene.position);
 const ambientLight = new THREE.AmbientLight(0x909090);
 scene.add(ambientLight);
 const light = new THREE.DirectionalLight(0x444444);
-light.position.set(1.5, 1, 1);
+light.position.set(1.5, 5, 10);
 scene.add(light);
 
 // game mode parameter 
